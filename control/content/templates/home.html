@@ -19,8 +19,14 @@
 
     </div>
     <div class="main col-md-9 pull-right">
-        <p class="margin-bottom-zero">Don't have a [PROVIDER_NAME] account? Sign up
-            <a ng-click="ContentHome.gotToWooCommerce()" >Here</a>.
+        <p class="margin-bottom-zero">1. Start with WooCommerce in <a ng-click="ContentHome.wooCommerceStepsURL()">5 Steps</a> , here's a <a ng-click="ContentHome.wooCommerceSetUpURL()">link</a> on how to setup a website with WooCommerce.</p>
+    </div>
+    <div class="main col-md-9 pull-right">
+        <p class="margin-bottom-zero">2. You also need to be running WordPress on a self-hosted site. Click <a ng-click="ContentHome.wooCommerceSelfHostURL()">here</a> for more information.</p>
+    </div>
+    <div class="main col-md-9 pull-right">
+        <p class="margin-bottom-zero">3. For instructions on how to attain your API keys click
+            <a ng-click="ContentHome.wooCommerceAPIKeysUrl()">Here</a>.
         </p>
     </div>
 </div>
@@ -64,7 +70,7 @@
 <div class="item clearfix row">
     <div class="col-md-4 pull-right">
         <button class="btn btn-primary pull-right stretch"
-                ng-disabled="!ContentHome.storeURL && !ContentHome.consumerKey && !ContentHome.consumerSecret" ng-click="ContentHome.verifyStore()">
+                ng-disabled="!ContentHome.storeURL || !ContentHome.consumerKey || !ContentHome.consumerSecret" ng-click="ContentHome.verifyStore()">
             Done</button>
     </div>
     </div>

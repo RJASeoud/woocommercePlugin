@@ -8,13 +8,21 @@
                 var WidgetHome = this;
                 WidgetHome.data = null;
                 WidgetHome.sections = [];
-                WidgetHome.busy = false;
+                WidgetHome.busy = true;
                 WidgetHome.pageNumber = 1;
                 //create new instance of buildfire carousel viewer
                 WidgetHome.view = null;
                 WidgetHome.safeHtml = function (html) {
-                    if (html)
-                        return $sce.trustAsHtml(html);
+                    if (html) {
+                        var $html = $('<div />', {html: html});
+                        $html.find('iframe').each(function (index, element) {
+                            var src = element.src;
+                            console.log('element is: ', src, src.indexOf('http'));
+                            src = src && src.indexOf('file://') != -1 ? src.replace('file://', 'http://') : src;
+                            element.src = src && src.indexOf('http') != -1 ? src : 'http:' + src;
+                        });
+                        return $sce.trustAsHtml($html.html());
+                    }
                 };
 
                 WidgetHome.showDescription = function (description) {
@@ -46,12 +54,14 @@
                 };
 
                 WidgetHome.goToCart = function () {
-                    ViewStack.push({
+                    /*ViewStack.push({
                         template: 'Checkout',
                         params: {
                             url: WidgetHome.data.content.storeURL + '/cart'
                         }
-                    });
+                    });*/
+                  if (WidgetHome.data && WidgetHome.data.content && WidgetHome.data.content.storeURL)
+                    buildfire.navigation.openWindow(WidgetHome.data.content.storeURL + '/cart', "_system");
                 };
 
                 var currentStoreUrl = "";
@@ -64,7 +74,7 @@
                             console.log("********************************", result.data);
                             WidgetHome.sections = WidgetHome.sections.length ? WidgetHome.sections.concat(result.data.product_categories) : result.data.product_categories;
                             WidgetHome.pageNumber = WidgetHome.pageNumber + 1;
-                            if (result.data.product_categories.length == PAGINATION.sectionsCount) {
+                            if (result && result.data && result.data.product_categories && (result.data.product_categories.length == PAGINATION.sectionsCount)) {
                                 WidgetHome.busy = false;
                             }
                         }
@@ -73,6 +83,16 @@
                             console.error('Error In Fetching category list', err);
                         };
                     WooCommerceSDK.getSections(storeURL, consumerKey, consumerSecret, WidgetHome.pageNumber).then(success, error);
+                };
+
+                var initialize = function (storeURL, consumerKey, consumerSecret) {
+                    var success = function (response) {
+                        getSections(storeURL, consumerKey, consumerSecret);
+                    };
+                    var error = function (err) {
+                        console.error('Error while initializing from widget side: ', err);
+                    };
+                    WooCommerceSDK.initialize(storeURL, consumerKey, consumerSecret).then(success, error);
                 };
 
                 /*
@@ -97,12 +117,16 @@
                             if (!WidgetHome.data.design.itemListLayout) {
                                 WidgetHome.data.design.itemListLayout = LAYOUTS.itemListLayout[0].name;
                             }
-                            console.log("WidgetHome.data.design.backgroundImage", WidgetHome.data.design.itemDetailsBgImage)
+                            console.log("WidgetHome.data.design.backgroundImage", WidgetHome.data.design.itemDetailsBgImage);
                             if (!WidgetHome.data.design.itemDetailsBgImage) {
                                 $rootScope.backgroundImage = "";
                             } else {
                                 $rootScope.backgroundImage = WidgetHome.data.design.itemDetailsBgImage;
                             }
+                            if (WidgetHome.data.content.storeURL && WidgetHome.data.content.consumerKey && WidgetHome.data.content.consumerSecret)
+                                initialize(WidgetHome.data.content.storeURL, WidgetHome.data.content.consumerKey, WidgetHome.data.content.consumerSecret);
+                            else
+                                WidgetHome.sections = [];
                         }
                         , error = function (err) {
                             console.error('Error while getting data', err);

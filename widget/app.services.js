@@ -147,6 +147,28 @@
       }])
       .factory('WooCommerceSDK', ['$q', 'STATUS_CODE', 'STATUS_MESSAGES', 'PAGINATION', 'SERVER_URL', '$http',
           function ($q, STATUS_CODE, STATUS_MESSAGES, PAGINATION, SERVER_URL, $http) {
+              var initialize = function (storeURL, consumerKey, consumerSecret) {
+                  var deferred = $q.defer();
+                  if (!storeURL || !consumerKey || !consumerSecret) {
+                      deferred.reject(new Error({
+                          code: STATUS_CODE.UNDEFINED_DATA,
+                          message: STATUS_MESSAGES.UNDEFINED_DATA
+                      }));
+                  } else {
+                      $http.post(SERVER_URL.link + '/initialize', {
+                          storeURL: storeURL,
+                          consumerKey: consumerKey,
+                          consumerSecret: consumerSecret
+                      })
+                          .success(function (response) {
+                              deferred.resolve(response);
+                          })
+                          .error(function (error) {
+                              deferred.reject(error);
+                          })
+                  }
+                  return deferred.promise;
+              };
               var getSections = function (storeURL, consumerKey, consumerSecret, pageNumber) {
                   var deferred = $q.defer();
                   var _url = '';
@@ -159,7 +181,10 @@
                       $http.get(SERVER_URL.link + '/productCategories', {
                           params: {
                               pageSize: PAGINATION.sectionsCount,
-                              pageNumber: pageNumber || 1
+                              pageNumber: pageNumber || 1,
+                              storeURL: storeURL,
+                              consumerKey: consumerKey,
+                              consumerSecret: consumerSecret
                           }
                       })
                           .success(function (response) {
@@ -187,7 +212,10 @@
                           params: {
                               slug: slug,
                               pageNumber: pageNumber || 1,
-                              pageSize: PAGINATION.sectionsCount
+                              pageSize: PAGINATION.sectionsCount,
+                              storeURL: storeURL,
+                              consumerKey: consumerKey,
+                              consumerSecret: consumerSecret
                           }
                       })
                           .success(function (response) {
@@ -213,7 +241,10 @@
                   } else {
                       $http.get(SERVER_URL.link + '/getProducts', {
                           params: {
-                              id: id
+                              id: id,
+                              storeURL: storeURL,
+                              consumerKey: consumerKey,
+                              consumerSecret: consumerSecret
                           }
                       })
                           .success(function (response) {
@@ -229,6 +260,7 @@
                   return deferred.promise;
               };
               return {
+                  initialize: initialize,
                   getSections: getSections,
                   getItems: getItems,
                   getProduct: getProduct

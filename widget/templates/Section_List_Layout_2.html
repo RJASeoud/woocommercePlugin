@@ -16,17 +16,16 @@
                      ng-repeat="section in WidgetHome.sections">
                     <div class="media-holder border-radius-three overflow-hidden">
                         <div class="media-img-holder">
-                            <img ng-if="!section.image" src="assets/images/239x100.png" ng-click="WidgetHome.showItems(section.slug)">
+                            <img ng-if="!section.image"
+                                 src="assets/.images/239x100.png" ng-click="WidgetHome.showItems(section.slug)">
                             <img load-image="239x100"
                                  data-final-src="{{section.image | getImageUrl : 640 : 380}}"
                                  ng-if="section.image" ng-click="WidgetHome.showItems(section.slug)">
                         </div>
-                        <div
-                                class="info-bar titleBarBackgroundTheme padding-left-ten text-center padding-right-ten">
-                            <p class="ellipsis margin-zero titleBarTextAndIcons"><a class="titleBarTextAndIcons"
-                                                                                    href="javascript:void(0);"
-                                                                                    ng-click="WidgetHome.showItems(section.slug)">{{section
-                                .name}}</a></p>
+                        <div class="info-bar titleBarBackgroundTheme padding-left-ten text-center padding-right-ten cursor"
+                             ng-click="WidgetHome.showItems(section.slug)">
+                            <p class="ellipsis margin-zero titleBarTextAndIcons">
+                                <a class="titleBarTextAndIcons" href="javascript:void(0);">{{section.name}}</a></p>
                         </div>
                     </div>
                 </div>

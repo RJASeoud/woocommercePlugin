@@ -21,7 +21,6 @@
                 };
                 var ContentHome = this;
                 ContentHome.masterData = null;
-                ContentHome.data = angular.copy(_data);
                 ContentHome.bodyWYSIWYGOptions = {
                     plugins: 'advlist autolink link image lists charmap print preview',
                     skin: 'lightgray',
@@ -65,7 +64,7 @@
                  * */
                 ContentHome.verifyStore = function () {
                     var success = function (result) {
-                            if (result) {
+                            if (result && result.status != 500) {
                                 ContentHome.storeVerifySuccess = true;
                                 $timeout(function () {
                                     ContentHome.storeVerifySuccess = false;
@@ -95,8 +94,20 @@
 
                 };
 
-                ContentHome.gotToWooCommerce = function () {
-                    window.open('https://wordpress.org/plugins/woocommerce/', '_blank');
+                ContentHome.wooCommerceAPIKeysUrl = function () {
+                    window.open('https://docs.woothemes.com/document/woocommerce-rest-api/#section-3', '_blank');
+                };
+
+                ContentHome.wooCommerceStepsURL = function () {
+                    window.open('https://docs.woothemes.com/document/start-with-woocommerce-in-5-steps/', '_blank');
+                };
+
+                ContentHome.wooCommerceSetUpURL = function () {
+                    window.open('https://docs.woothemes.com/document/woocommerce-onboarding-wizard/', '_blank');
+                };
+
+                ContentHome.wooCommerceSelfHostURL = function () {
+                    window.open('https://www.bluehost.com/wordpress-woocommerce?ref=woocommercedocs', '_blank');
                 };
 
                 /*
@@ -131,23 +142,26 @@
                 var init = function () {
                     var success = function (result) {
                             console.info('init success result:', result);
-                            ContentHome.data = result.data;
-                            if (!ContentHome.data.content)
-                                ContentHome.data.content = {};
-                            if (!ContentHome.data.content.carouselImages)
-                                editor.loadItems([]);
-                            else
-                                editor.loadItems(ContentHome.data.content.carouselImages);
-                            if (ContentHome.data.content.storeURL)
-                                ContentHome.storeURL = ContentHome.data.content.storeURL;
-                            if (ContentHome.data.content.consumerKey)
-                                ContentHome.consumerKey = ContentHome.data.content.consumerKey;
-                            if (ContentHome.data.content.consumerSecret) {
-                                ContentHome.consumerSecret = ContentHome.data.content.consumerSecret;
-                                ContentHome.verifyStore();
+                            if (result && result.data) {
+                                ContentHome.data = result.data;
+                                if (!ContentHome.data.content)
+                                    ContentHome.data.content = {};
+                                if (!ContentHome.data.content.carouselImages)
+                                    editor.loadItems([]);
+                                else
+                                    editor.loadItems(ContentHome.data.content.carouselImages);
+                                if (ContentHome.data.content.storeURL)
+                                    ContentHome.storeURL = ContentHome.data.content.storeURL;
+                                if (ContentHome.data.content.consumerKey)
+                                    ContentHome.consumerKey = ContentHome.data.content.consumerKey;
+                                if (ContentHome.data.content.consumerSecret) {
+                                    ContentHome.consumerSecret = ContentHome.data.content.consumerSecret;
+                                }
+                                updateMasterItem(ContentHome.data);
+                                if (tmrDelay)clearTimeout(tmrDelay);
+                            } else {
+                                ContentHome.data = angular.copy(_data);
                             }
-                            updateMasterItem(ContentHome.data);
-                            if (tmrDelay)clearTimeout(tmrDelay);
                         }
                         , error = function (err) {
                             if (err && err.code !== STATUS_CODE.NOT_FOUND) {
